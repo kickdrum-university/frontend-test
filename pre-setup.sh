@@ -22,7 +22,7 @@ cat << 'EOF' > .husky/pre-commit
 . "$(dirname -- "$0")/_/husky.sh"
 
 # Run ESLint with the rule to detect unused imports and output results to console
-eslint_output=$(npx eslint --max-warnings=0 --ext .js,.jsx,.ts,.tsx .)
+eslint_output=$(npx eslint --max-warnings=0 --ext .js,.jsx,.ts,.tsx . 2>&1)
 
 # Check if ESLint found any issues
 if [ $? -ne 0 ]; then
