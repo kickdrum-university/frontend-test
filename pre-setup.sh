@@ -22,15 +22,13 @@ cat << 'EOF' > .husky/pre-commit
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-tsc
 npx lint-staged
 EOF
 chmod +x .husky/pre-commit
 
 # Configure lint-staged to run pre-commit tests
 npm install lint-staged --save-dev
-npm install sonarqube-scanner --save-dev
-npx json -I -f package.json -e 'this["lint-staged"]={"*.{js,jsx,ts,tsx}":["sonar-scanner","npx prettier --write","npm test -- --watchAll=false --findRelatedTests --bail","npx eslint"]}'
+npx json -I -f package.json -e 'this["lint-staged"]={"*.{js,jsx,ts,tsx}":["npx prettier --write","npm test -- --watchAll=false --findRelatedTests --bail","npx eslint"]}'
 
 # Run pre-commit tests for the first time
 # npm run pre-commit

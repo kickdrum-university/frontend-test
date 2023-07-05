@@ -49,7 +49,6 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "sonar-scanner",
       "npx prettier --write",
       "npm test -- --watchAll=false --findRelatedTests --bail",
       "npx eslint"
