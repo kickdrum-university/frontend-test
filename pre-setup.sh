@@ -23,7 +23,7 @@ cat << 'EOF' > .husky/pre-commit
 . "$(dirname -- "$0")/_/husky.sh"
 
 # Run ESLint with the rule to detect unused imports
-npx eslint --max-warnings=0 --ext .js,.jsx,.ts,.tsx --quiet .
+eslint_output=$(npx eslint --max-warnings=0 --ext .js,.jsx,.ts,.tsx .)
 
 npx lint-staged
 EOF
