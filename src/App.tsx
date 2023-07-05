@@ -1,10 +1,9 @@
 import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
+import { useEffect } from "react";
 
 function App() {
-  const varName = "";
-
   return (
     <div className="App">
       <header className="App-header">
