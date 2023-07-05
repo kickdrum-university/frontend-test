@@ -1,7 +1,13 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# Run ESLint with the rule to detect unused imports
+# Run ESLint with the rule to detect unused imports and output results to console
 eslint_output=$(npx eslint --max-warnings=0 --ext .js,.jsx,.ts,.tsx .)
+
+# Check if ESLint found any issues
+if [ $? -ne 0 ]; then
+  echo "$eslint_output"
+  exit 1
+fi
 
 npx lint-staged
