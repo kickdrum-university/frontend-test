@@ -8,7 +8,8 @@ else
 fi
 
 # Install Husky if it's not already installed
-if ! command -v husky &> /dev/null; then
+if ! command -v husky &> /dev/null
+then
   npm install husky --save-dev
 fi
 
@@ -21,14 +22,8 @@ cat << 'EOF' > .husky/pre-commit
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# Run ESLint with the rule to detect unused imports and output results to console
-eslint_output=$(npx eslint --max-warnings=0 --ext .js,.jsx,.ts,.tsx . 2>&1)
-
-# Check if ESLint found any issues
-if [ $? -ne 0 ]; then
-  echo "$eslint_output"
-  exit 1
-fi
+# Run ESLint with the rule to detect unused imports
+npx eslint --max-warnings=0 --ext .js,.jsx,.ts,.tsx --quiet .
 
 npx lint-staged
 EOF
@@ -36,4 +31,6 @@ chmod +x .husky/pre-commit
 
 # Configure lint-staged to run pre-commit tests
 npm install lint-staged --save-dev
-npx json -I -f package.json -e 'this["lint-staged"]={"*.{js,jsx,ts,tsx}":["npx prettier --write","npm test -- --watchAll=false --findRelatedTests --bail","npx eslint --max-warnings=0 --ext .js,.jsx,.ts,.tsx ."]}'
+npx json -I -f package.json -e 'this["lint-staged"]={"*.{js,jsx,ts,tsx}":["npx prettier --write","npm test -- --watchAll=false --findRelatedTests --bail","npx eslint"]}'
+
+
