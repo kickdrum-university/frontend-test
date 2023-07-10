@@ -23,7 +23,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          npm run test -- --coverage --coverageReporters=html
+          npx nyc --reporter=lcov --reporter=html --report-dir=coverage npm test
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v2
@@ -31,14 +31,8 @@ jobs:
           name: coverage
           path: coverage
 
-      - name: Generate HTML coverage report
-        run: |
-          npm install -g istanbul@latest
-          npm install -g istanbul-reports@latest
-          istanbul report --include coverage/coverage-final.json --dir coverage/html istanbul-reports
-
       - name: Upload HTML coverage report
         uses: actions/upload-artifact@v2
         with:
           name: html-coverage
-          path: coverage/html
+          path: coverage/lcov-report
