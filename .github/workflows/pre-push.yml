@@ -21,14 +21,24 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build
-        run: npm run build
-
       - name: Run tests with coverage
-        run: npm run test:coverage
+        run: |
+          npm run test -- --coverage --coverageReporters=html
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v2
         with:
           name: coverage
           path: coverage
+
+      - name: Generate HTML coverage report
+        run: |
+          npm install -g istanbul@latest
+          npm install -g istanbul-reports@latest
+          istanbul report --include coverage/coverage-final.json --dir coverage/html istanbul-reports
+
+      - name: Upload HTML coverage report
+        uses: actions/upload-artifact@v2
+        with:
+          name: html-coverage
+          path: coverage/html
