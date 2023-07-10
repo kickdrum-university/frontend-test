@@ -21,9 +21,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Build
+        run: npm run build
+
       - name: Run tests with coverage
-        run: |
-          npx nyc --reporter=lcov --reporter=html --report-dir=coverage npm test
+        run: npm run test:coverage
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v2
@@ -31,8 +33,9 @@ jobs:
           name: coverage
           path: coverage
 
-      - name: Upload HTML coverage report
-        uses: actions/upload-artifact@v2
-        with:
-          name: html-coverage
-          path: coverage/lcov-report
+
+
+
+
+
+
