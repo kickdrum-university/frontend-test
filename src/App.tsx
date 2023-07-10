@@ -18,7 +18,7 @@ function App() {
         >
           Learn React
         </a>
-        <p>Frontend testing pre-commit , pre-push , post-pus</p>
+        <p>Frontend testing pre-commit pre-push , post-pus</p>
       </header>
     </div>
   );
