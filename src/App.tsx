@@ -18,7 +18,7 @@ function App() {
         >
           Learn React
         </a>
-        <p>Frontend testing pre-commit re-push , postpush</p>
+        <p>Frontend testing pre-commit re-push ostpush sonarQube added</p>
       </header>
     </div>
   );
