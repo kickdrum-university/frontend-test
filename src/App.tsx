@@ -18,7 +18,10 @@ function App() {
         >
           Learn React
         </a>
-        <p>Frontend testing pre-commit re-push ostpush sonarQube added</p>
+        <p>
+          Frontend testing pre-commit re-push ostpush sonarQube added
+          password="123"
+        </p>
       </header>
     </div>
   );
