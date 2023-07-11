@@ -3,6 +3,7 @@ import logo from "./logo.svg";
 import "./App.css";
 
 function App() {
+  const password = "123";
   return (
     <div className="App">
       <header className="App-header">
@@ -20,7 +21,7 @@ function App() {
         </a>
         <p>
           Frontend testing pre-commit re-push ostpush sonarQube added
-          password="123"
+          {password}
         </p>
       </header>
     </div>
