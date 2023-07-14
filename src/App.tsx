@@ -20,7 +20,7 @@ function App() {
           Learn React
         </a>
         <p>
-          Frontend testing pre-commt re-push stpush sonarQue added it
+          Frontend testing pre-commt re-puh stpush sonarQue added it
           {password}
         </p>
       </header>
