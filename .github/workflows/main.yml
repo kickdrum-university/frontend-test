@@ -33,9 +33,9 @@ jobs:
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::503226040441:policy/kdu-automation-s3-access
+          role-to-assume: arn:aws:iam::503226040441:role/kdu-automation-s3-access
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
-          #aws-region: us-east-1
+          aws-region: us-east-1
 
       - name: Check if bucket exists
         id: check-bucket
