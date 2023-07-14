@@ -35,7 +35,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::503226040441:role/kdu-automation-s3access-oidc
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
-          aws-region: us-east-1
+          aws-region: ap-south-1
 
       - name: Check if bucket exists
         id: check-bucket
