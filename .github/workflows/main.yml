@@ -33,7 +33,7 @@ jobs:
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::766971438535:role/kdu-exercise-deploy-automation-role
+          role-to-assume: arn:aws:iam::503226040441:policy/kdu-automation-s3-access
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: ap-south-1
 
