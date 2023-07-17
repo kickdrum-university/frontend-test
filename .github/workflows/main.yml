@@ -1,4 +1,3 @@
-
 name: CI/CD Pipeline
 
 on:
@@ -54,11 +53,16 @@ jobs:
       - name: Create bucket if it doesn't exist
         if: steps.check-bucket.outputs.bucket_exists == 'false'
         run: |
-          # Get the bucket name generated in the previous step
+          # Get the bucket name, student name, and exercise name generated in the previous step
           USER_BUCKET_NAME="${{ steps.check-bucket.outputs.bucket_name }}"
-          echo "$USER_BUCKET_NAME"
-          # Create the bucket
-          aws s3api create-bucket --bucket $USER_BUCKET_NAME --region ap-south-1 --create-bucket-configuration LocationConstraint=ap-south-1
+          STUDENT_NAME="student-$(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]')"
+          EXERCISE_NAME=$(echo "${{ github.ref }}" | awk -F'/' '{print $3}')
+
+          # Set the path to the exercise folder
+          EXERCISE_PATH="${STUDENT_NAME}/${EXERCISE_NAME}"
+
+          # Create the bucket with the desired folder structure
+          aws s3api create-bucket --bucket $USER_BUCKET_NAME --region ap-south-1 --create-bucket-configuration LocationConstraint=ap-south-1 --object-lock-enabled-for-bucket
           aws s3api put-public-access-block --bucket $USER_BUCKET_NAME --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false"
           # Apply the public-read canned ACL to all objects in the bucket
           # aws s3api put-bucket-acl --bucket $USER_BUCKET_NAME --acl public-read
@@ -79,22 +83,31 @@ jobs:
             "ErrorDocument": {"Key": "index.html"},
             "IndexDocument": {"Suffix": "index.html"}
           }'
+
       - name: Deploy to user's branch-specific bucket
-        #         if: steps.check-bucket.outputs.bucket_exists == 'true'
         run: |
-          # Get the bucket name generated in the previous step
+          # Get the bucket name, student name, and exercise name generated in the previous step
           USER_BUCKET_NAME="${{ steps.check-bucket.outputs.bucket_name }}"
-          aws s3 sync build/ s3://$USER_BUCKET_NAME
+          STUDENT_NAME="student-$(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]')"
+          EXERCISE_NAME=$(echo "${{ github.ref }}" | awk -F'/' '{print $3}')
+          EXERCISE_PATH="${STUDENT_NAME}/${EXERCISE_NAME}"
+
+          aws s3 sync build/ s3://$USER_BUCKET_NAME/$EXERCISE_PATH
+
       - name: Generate deployment URL
-        #         if: steps.check-bucket.outputs.bucket_exists == 'true'
         id: generate-deployment-url
         run: |
-          # Get the bucket name generated in the previous step
+          # Get the bucket name, student name, and exercise name generated in the previous step
           USER_BUCKET_NAME="${{ steps.check-bucket.outputs.bucket_name }}"
+          STUDENT_NAME="student-$(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]')"
+          EXERCISE_NAME=$(echo "${{ github.ref }}" | awk -F'/' '{print $3}')
+          EXERCISE_PATH="${STUDENT_NAME}/${EXERCISE_NAME}"
+
           # Generate the deployment URL based on the user and branch-specific bucket name
-          DEPLOYMENT_URL="http://$USER_BUCKET_NAME.s3-website.ap-south-1.amazonaws.com"
+          DEPLOYMENT_URL="http://$USER_BUCKET_NAME.s3-website.ap-south-1.amazonaws.com/$EXERCISE_PATH"
           echo $DEPLOYMENT_URL
           echo "::set-output name=deployment_url::$DEPLOYMENT_URL"
+
       - name: Get deployment URL and update JSON file
         run: |
           # Get the deployment URL from the previous step
@@ -105,22 +118,22 @@ jobs:
           # Get the branch name
           BRANCH_NAME=$(echo "${{ github.ref }}" | awk -F'/' '{print $3}')
           # Specify the bucket details
-          BUCKET_NAME="kdu-automation"
-          FOLDER_NAME="frontend"
+          BUCKET_NAME=$USER_BUCKET_NAME
+          FOLDER_NAME=$EXERCISE_PATH
+
           # Check if the JSON file exists in the bucket
-          if aws s3 ls s3://${BUCKET_NAME}/${FOLDER_NAME}/${BRANCH_NAME}.json; then
+          if aws s3 ls s3://${BUCKET_NAME}/${FOLDER_NAME}/${STUDENT_NAME}-${BRANCH_NAME}.json; then
             # Download the JSON file from the bucket
-            aws s3 cp s3://${BUCKET_NAME}/${FOLDER_NAME}/${BRANCH_NAME}.json ./temp.json
-            
+            aws s3 cp s3://${BUCKET_NAME}/${FOLDER_NAME}/${STUDENT_NAME}-${BRANCH_NAME}.json ./temp.json
+
             # Add the key-value pair to the JSON file
             jq --arg username "$GITHUB_USERNAME-$BRANCH_NAME" --arg url "$DEPLOYMENT_URL" '. + {($username): $url}' temp.json > updated.json
-            
+
             # Upload the updated JSON file back to the bucket
-            aws s3 cp ./updated.json s3://${BUCKET_NAME}/${FOLDER_NAME}/${BRANCH_NAME}.json
+            aws s3 cp ./updated.json s3://${BUCKET_NAME}/${FOLDER_NAME}/${STUDENT_NAME}-${BRANCH_NAME}.json
           else
             # Create a new JSON file with the key-value pair
             echo "{\"$GITHUB_USERNAME-$BRANCH_NAME\":\"$DEPLOYMENT_URL\"}" > new.json
-            
+
             # Upload the new JSON file to the bucket
-            aws s3 cp ./new.json s3://${BUCKET_NAME}/${FOLDER_NAME}/${BRANCH_NAME}.json
-          fi
+            aws s3 cp ./new.json s3://${BUCKET_NAME}/${FOLDER
