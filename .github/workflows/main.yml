@@ -105,20 +105,20 @@ jobs:
           # Get the branch name
           BRANCH_NAME=$(echo "${{ github.ref }}" | awk -F'/' '{print $3}')
           # Specify the bucket details
-          BUCKET_NAME="kdu-frontend"
+          BUCKET_NAME="kdu-automation"
           # Check if the JSON file exists in the bucket
           if aws s3 ls s3://${BUCKET_NAME}/${BRANCH_NAME}.json; then
             # Download the JSON file from the bucket
             aws s3 cp s3://${BUCKET_NAME}/${BRANCH_NAME}.json ./temp.json
             
             # Add the key-value pair to the JSON file
-            jq --arg username "$GITHUB_USERNAME" --arg url "$DEPLOYMENT_URL" '. + {($username): $url}' temp.json > updated.json
+            jq --arg username "$GITHUB_USERNAME-$BRANCH_NAME" --arg url "$DEPLOYMENT_URL" '. + {($username): $url}' temp.json > updated.json
             
             # Upload the updated JSON file back to the bucket
             aws s3 cp ./updated.json s3://${BUCKET_NAME}/${BRANCH_NAME}.json
           else
             # Create a new JSON file with the key-value pair
-            echo "{\"$GITHUB_USERNAME\":\"$DEPLOYMENT_URL\"}" > new.json
+            echo "{\"$GITHUB_USERNAME-$BRANCH_NAME\":\"$DEPLOYMENT_URL\"}" > new.json
             
             # Upload the new JSON file to the bucket
             aws s3 cp ./new.json s3://${BUCKET_NAME}/${BRANCH_NAME}.json
