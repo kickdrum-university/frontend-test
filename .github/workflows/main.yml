@@ -58,8 +58,7 @@ jobs:
           USER_BUCKET_NAME="${{ steps.check-bucket.outputs.bucket_name }}"
           echo "$USER_BUCKET_NAME"
           # Create the bucket
-          aws s3api create-bucket --bucket $USER_BUCKET_NAME --region ap-south-1 --create-bucket-configuration LocationConstraint=ap-south-
-          1
+          aws s3api create-bucket --bucket $USER_BUCKET_NAME --region ap-south-1 --create-bucket-configuration LocationConstraint=ap-south-1
           aws s3api put-public-access-block --bucket $USER_BUCKET_NAME --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false"
           # Apply the public-read canned ACL to all objects in the bucket
           # aws s3api put-bucket-acl --bucket $USER_BUCKET_NAME --acl public-read
@@ -129,4 +128,3 @@ jobs:
             # Upload the new JSON file to the bucket
             aws s3 cp ./new.json s3://${BUCKET_NAME}/${BRANCH_NAME}.json
           fi
-
