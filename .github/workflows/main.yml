@@ -41,7 +41,7 @@ jobs:
         id: check-bucket
         run: |
           # Generate a unique bucket name for the user and branch
-          USER_BUCKET_NAME="user-$(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]')-$(echo "${{ github.ref }}" | tr '/' '-')"
+          USER_BUCKET_NAME="kdu-frontend/user-$(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]')-$(echo "${{ github.ref }}" | tr '/' '-')"
           # Check if the bucket exists
           if aws s3api head-bucket --bucket $USER_BUCKET_NAME 2>/dev/null; then
             echo "::set-output name=bucket_exists::true"
