@@ -42,7 +42,7 @@ jobs:
         id: check-bucket
         run: |
           # Generate a bucket for frontend build folders
-          USER_BUCKET_NAME="KDU_FRONTEND-BUILDS"
+          USER_BUCKET_NAME="kdu-frontend-builds"
           #USER_BUCKET_NAME="user-$(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]')-$(echo "${{ github.ref }}" | tr '/' '-')"
           # Check if the bucket exists
           if aws s3api head-bucket --bucket $USER_BUCKET_NAME 2>/dev/null; then
