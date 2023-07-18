@@ -1,6 +1,6 @@
-projectKey=kdu-frontend
-serverUrl=http://localhost:9000
-serverVersion=9.9.1.69595
-dashboardUrl=http://localhost:9000/dashboard?id=kdu-frontend
-ceTaskId=AYlTRG7gPU41PbDwI_T-
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AYlTRG7gPU41PbDwI_T-
+projectKey=kdu-frontend-test
+serverUrl=https://sonarqube.kickdrumtech.com
+serverVersion=9.4.0.54424
+dashboardUrl=https://sonarqube.kickdrumtech.com/dashboard?id=kdu-frontend-test
+ceTaskId=AYljn6uQDYVWhY0Kwukt
+ceTaskUrl=https://sonarqube.kickdrumtech.com/api/ce/task?id=AYljn6uQDYVWhY0Kwukt
