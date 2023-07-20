@@ -35,28 +35,16 @@ aws s3 sync build/ s3://$USER_BUCKET_NAME --profile AccountLevelFullAccess-50322
 DEPLOYMENT_URL="http://$USER_BUCKET_NAME.s3-website.ap-south-1.amazonaws.com"
 echo "Deployment URL: $DEPLOYMENT_URL"
 
-#!/bin/bash
-
-# Function to print JSON content
-print_json_content() {
-  echo "JSON content in $1:"
-  echo "-----------------------------"
-  cat "$1"
-  echo "-----------------------------"
-}
 
 # Update JSON file with the deployment URL
 USERNAME=$(git config user.name)
 BRANCH_NAME=$(git symbolic-ref --short HEAD)
-FILENAME="${BRANCH_NAME}.json"
+FILENAME="submissions.json"
 
 # Check if the JSON file exists in the bucket
 if aws s3 ls s3://kdu-automation/frontend/"$FILENAME" --profile AccountLevelFullAccess-503226040441; then
   # Download the JSON file from the bucket
   aws s3 cp s3://kdu-automation/frontend/"$FILENAME" ./temp.json --profile AccountLevelFullAccess-503226040441
-
-  # Print the existing JSON content
-  print_json_content "./temp.json"
 
   # Add the key-value pair to the JSON object using awk
   NEW_JSON="{\"$USERNAME-$BRANCH_NAME\":\"$DEPLOYMENT_URL\"}"
@@ -65,23 +53,16 @@ if aws s3 ls s3://kdu-automation/frontend/"$FILENAME" --profile AccountLevelFull
   # Overwrite the original file with the updated content
   mv ./temp2.json ./temp.json
 
-  # Print the updated JSON content
-  print_json_content "./temp.json"
-
   # Upload the updated JSON file back to the bucket
-  aws s3 cp ./temp.json s3://kdu-automation/frontend/"$FILENAME" --profile AccountLevelFullAccess-503226040441
+  aws s3 cp ./new.json s3://kdu-automation/frontend/"$FILENAME" --profile AccountLevelFullAccess-503226040441
 
   echo "JSON file uploaded successfully."
 else
   # Create a new JSON file with the key-value pair
   echo "{\"$USERNAME-$BRANCH_NAME\":\"$DEPLOYMENT_URL\"}" > new.json
 
-  # Print the content of the new JSON file
-  print_json_content "./new.json"
-
-  # Upload the new JSON file to the bucket
+  # Upload the new JSON file directly to the bucket
   aws s3 cp ./new.json s3://kdu-automation/frontend/"$FILENAME" --profile AccountLevelFullAccess-503226040441
 
   echo "JSON file uploaded successfully."
 fi
-
