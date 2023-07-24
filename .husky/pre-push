@@ -3,6 +3,33 @@
 # Build the React project
 npm run build
 
+USERNAME=$(git config user.name)
+BRANCH_NAME=$(git symbolic-ref --short HEAD)
+
+#Create Sonar Report and show it in the project 
+SONAR_PROJECT_KEY="$USERNAME-$BRANCH_NAME-frontend"
+SONAR_SERVER_URL="http://52.66.250.171:9000"  
+SONAR_TOKEN="squ_75df016a1b9b75341744ba5783fc7d61f0708c93"  
+
+# Change to the root directory of your project (if necessary)
+# cd /path/to/your/project
+
+# Run the SonarScanner analysis
+sonar-scanner \
+  -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
+  -Dsonar.host.url="$SONAR_SERVER_URL" \
+  -Dsonar.login="$SONAR_TOKEN" \
+  -Dsonar.sources="./src"  # Adjust the path to your source code if needed
+
+# Check if the analysis was successful
+if [ $? -eq 0 ]; then
+  echo "SonarScanner analysis completed successfully."
+else
+  echo "SonarScanner analysis failed. Please check the logs for more details."
+fi
+
+
+
 # Check if the bucket exists
 USER_BUCKET_NAME="user-$(git config user.name | tr '[:upper:]' '[:lower:]')-$(git symbolic-ref --short HEAD | tr '/' '-')"
 if aws s3api head-bucket --bucket $USER_BUCKET_NAME --profile AccountLevelFullAccess-503226040441 2>/dev/null; then
@@ -67,9 +94,7 @@ add_key_value_to_json() {
 
 
 # Update JSON file with the deployment URL
-USERNAME=$(git config user.name)
-#BRANCH_NAME=$(git symbolic-ref --short HEAD)
-BRANCH_NAME="exercise-11"
+
 FILENAME="submissions.json"
 
 # Check if the JSON file exists in the bucket
