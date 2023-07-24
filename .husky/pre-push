@@ -1,7 +1,16 @@
 #!/bin/bash
 
-# Build the React project
-npm run build
+# Function to detect the current platform
+get_platform() {
+  case "$(uname -s)" in
+    Linux*)   echo "linux";;
+    Darwin*)  echo "mac";;
+    CYGWIN*)  echo "windows";;
+    MINGW*)   echo "windows";;
+    *)        echo "unsupported";;
+  esac
+}
+
 
 USERNAME=$(git config user.name)
 BRANCH_NAME=$(git symbolic-ref --short HEAD)
@@ -14,8 +23,18 @@ SONAR_TOKEN="squ_75df016a1b9b75341744ba5783fc7d61f0708c93"
 # Change to the root directory of your project (if necessary)
 # cd /path/to/your/project
 
+# Detect the current platform
+PLATFORM=$(get_platform)
+
+# Set the appropriate SonarScanner command based on the platform
+if [ "$PLATFORM" == "windows" ]; then
+  SONAR_SCANNER_CMD="sonar-scanner.bat"
+else
+  SONAR_SCANNER_CMD="sonar-scanner"
+fi
+
 # Run the SonarScanner analysis
-sonar-scanner \
+"$SONAR_SCANNER_CMD" \
   -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
   -Dsonar.host.url="$SONAR_SERVER_URL" \
   -Dsonar.login="$SONAR_TOKEN" \
@@ -28,7 +47,8 @@ else
   echo "SonarScanner analysis failed. Please check the logs for more details."
 fi
 
-
+# Build the React project
+npm run build
 
 # Check if the bucket exists
 USER_BUCKET_NAME="user-$(git config user.name | tr '[:upper:]' '[:lower:]')-$(git symbolic-ref --short HEAD | tr '/' '-')"
@@ -117,4 +137,5 @@ aws s3 cp ./temp.json "s3://kdu-automation/frontend/$FILENAME" --profile Account
 
 echo "JSON file uploaded successfully."
 
-
+#remove the temporary file
+rm ./temp.json
