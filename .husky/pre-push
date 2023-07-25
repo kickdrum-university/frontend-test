@@ -102,7 +102,6 @@ add_key_value_to_json() {
 
 # Update JSON file with the deployment URL
 USERNAME=$(git config user.name)
-#BRANCH_NAME=$(git symbolic-ref --short HEAD)
 BRANCH_NAME=$(git symbolic-ref --short HEAD)
 FILENAME="studentExercises.json"
 
