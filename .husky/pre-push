@@ -54,6 +54,7 @@ S3_BUCKET="kdu-automation"
 FOLDER_NAME="builds"
 S3_FOLDER="$USERNAME-$BRANCH_NAME"
 
+echo "Root dir" $ROOT_DIR
 # Upload HTML, CSS, and JS files to S3
 aws s3 sync "$ROOT_DIR" "s3://$S3_BUCKET/$FOLDER_NAME/$S3_FOLDER" --delete --profile AccountLevelFullAccess-503226040441
 
