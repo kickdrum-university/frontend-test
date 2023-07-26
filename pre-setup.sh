@@ -8,17 +8,25 @@ else
 fi
 
 # Install Husky if it's not already installed
-if ! command -v husky &> /dev/null
-then
+if ! command -v husky &> /dev/null; then
   npm install husky --save-dev
 fi
 
-cd "$ROOT_DIR"
+# Configure Husky to run pre-commit tests
+
 npx husky-init
 mkdir -p .husky
+cat << 'EOF' > .husky/pre-commit
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
 
 
-cat <<'EOF' > .husky/pre-push
+EOF
+chmod +x .husky/pre-commit
+
+
+# Pre-push hook
+cat << 'EOF' > .husky/pre-push
 #!/bin/bash
 
 # Function to detect the current platform
@@ -40,9 +48,6 @@ SONAR_PROJECT_KEY="$USERNAME-$BRANCH_NAME-frontend"
 SONAR_SERVER_URL="http://52.66.250.171:9000"  
 SONAR_TOKEN="squ_75df016a1b9b75341744ba5783fc7d61f0708c93"  
 
-# Change to the root directory of your project (if necessary)
-# cd /path/to/your/project
-
 # Detect the current platform
 PLATFORM=$(get_platform)
 
@@ -53,15 +58,12 @@ else
   SONAR_SCANNER_CMD="sonar-scanner"
 fi
 
-# Build the project (if necessary)
-# Add your build command here if required for your project
-
 # Run the SonarScanner analysis
 "$SONAR_SCANNER_CMD" \
   -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
   -Dsonar.host.url="$SONAR_SERVER_URL" \
   -Dsonar.login="$SONAR_TOKEN" \
-  -Dsonar.sources="$ROOT_DIR"  # Use the root directory of your project for HTML, CSS, JS files
+  -Dsonar.sources="$ROOT_DIR"  # Use the root directory as the source for SonarScanner
 
 # Check if the analysis was successful
 if [ $? -eq 0 ]; then
@@ -83,6 +85,65 @@ USER_BUCKET_NAME="user-$(git config user.name | tr '[:upper:]' '[:lower:]')-$(gi
 # Generate the deployment URL
 DEPLOYMENT_URL="http://$USER_BUCKET_NAME.s3-website.ap-south-1.amazonaws.com"
 echo "Deployment URL: $DEPLOYMENT_URL"
+
+# Function to check if the JSON file exists in the bucket
+check_json_file_exists() {
+    local filename="$1"
+
+    if aws s3 ls "s3://kdu-automation/frontend/$filename" --profile AccountLevelFullAccess-503226040441 &>/dev/null; then
+        return 0  # File exists
+    else
+        return 1  # File does not exist
+    fi
+}
+
+# Function to add or update key-value pair in JSON object using jq
+add_key_value_to_json() {
+    local key="$1"
+    local value="$2"
+    local json_file="$3"
+
+    if jq --exit-status --arg key "$key" --arg value "$value" '.[$key] |= $value' "$json_file"; then
+        # If the key exists, update the value
+        jq --arg key "$key" --arg value "$value" '.[$key] |= $value' "$json_file" > "$json_file.tmp"
+    else
+        # If the key doesn't exist, add the new key-value pair to the JSON object
+        jq --arg key "$key" --arg value "$value" '. + { ($key): $value }' "$json_file" > "$json_file.tmp"
+    fi
+    mv "$json_file.tmp" "$json_file"
+}
+
+# Update JSON file with the deployment URL
+USERNAME=$(git config user.name)
+BRANCH_NAME=$(git symbolic-ref --short HEAD)
+FILENAME="studentExercises.json"
+
+# Check if the JSON file exists in the bucket
+if check_json_file_exists "$FILENAME"; then
+    # Download the JSON file from the bucket
+    aws s3 cp "s3://kdu-automation/frontend/$FILENAME" ./temp.json --profile AccountLevelFullAccess-503226040441
+else
+    # Create a new empty JSON file if it doesn't exist in the bucket
+    echo "{}" > ./temp.json
+fi
+
+# Add or update the key-value pair in the JSON object
+KEY="$USERNAME-$BRANCH_NAME"
+VALUE="$DEPLOYMENT_URL"  # Remove the escaped double quotes here
+
+add_key_value_to_json "$KEY" "$VALUE" ./temp.json
+
+# Upload the updated JSON file back to the bucket
+aws s3 cp ./temp.json "s3://kdu-automation/frontend/$FILENAME" --profile AccountLevelFullAccess-503226040441
+
+echo "JSON file uploaded successfully."
+
+# Check if the upload was successful
+if [ $? -eq 0 ]; then
+  echo "Build uploaded to S3 bucket successfully."
+else
+  echo "Failed to upload the build to S3 bucket. Please check the logs for more details."
+fi
 
 EOF
 
