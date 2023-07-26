@@ -4,14 +4,13 @@
 /node_modules
 /.pnp
 .pnp.js
-/.scannerwork
 
 # testing
 /coverage
 
 # production
 /build
-/.scannerwork
+.scannerwork/
 
 
 # misc
