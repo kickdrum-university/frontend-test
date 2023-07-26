@@ -4,12 +4,15 @@
 /node_modules
 /.pnp
 .pnp.js
+/.scannerwork
 
 # testing
 /coverage
 
 # production
 /build
+/.scannerwork
+
 
 # misc
 .DS_Store
