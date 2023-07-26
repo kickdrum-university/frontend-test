@@ -1,11 +1,17 @@
 #!/bin/bash
 
+cd "$(git rev-parse --show-toplevel)"
+
+# Rest of the script as before...
+
 # Set the root directory
 if [ -z "$1" ] || [ "$1" = "." ]; then
-  ROOT_DIR="$(pwd)"
+  ROOT_DIR=$(pwd)
 else
   ROOT_DIR="$1"
 fi
+
+
 
 # Function to detect the current platform
 get_platform() {
@@ -57,7 +63,7 @@ S3_FOLDER="$USERNAME-$BRANCH_NAME"
 
 echo "Rootdir" $ROOT_DIR
 # Upload HTML, CSS, and JS files to S3
-aws s3 sync "$ROOT_DIR" "s3://$S3_BUCKET/$FOLDER_NAME/$S3_FOLDER" --delete --profile AccountLevelFullAccess-503226040441
+aws s3 sync "C:\Users\LENOVO\Desktop\frontend\project" "s3://$S3_BUCKET/$FOLDER_NAME/$S3_FOLDER" --delete --profile AccountLevelFullAccess-503226040441
 
 USER_BUCKET_NAME="user-$(git config user.name | tr '[:upper:]' '[:lower:]')-$(git symbolic-ref --short HEAD | tr '/' '-')"
 
