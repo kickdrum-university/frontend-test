@@ -25,8 +25,7 @@ get_platform() {
 }
 
 USERNAME=$(git config user.name)
-#BRANCH_NAME=$(git symbolic-ref --short HEAD)
-BRANCH_NAME="exercise-3"
+BRANCH_NAME=$(git symbolic-ref --short HEAD)
 
 #Create Sonar Report and show it in the project 
 SONAR_PROJECT_KEY="$USERNAME-$BRANCH_NAME-frontend"
@@ -101,7 +100,7 @@ add_key_value_to_json() {
 
 # Update JSON file with the deployment URL
 USERNAME=$(git config user.name)
-#BRANCH_NAME=$(git symbolic-ref --short HEAD)
+BRANCH_NAME=$(git symbolic-ref --short HEAD)
 FILENAME="studentExercises.json"
 
 # Check if the JSON file exists in the bucket
