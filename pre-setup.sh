@@ -58,8 +58,7 @@ SONAR_PROJECT_KEY="$USERNAME-$BRANCH_NAME-frontend"
 SONAR_SERVER_URL="http://52.66.250.171:9000"  
 SONAR_TOKEN="squ_75df016a1b9b75341744ba5783fc7d61f0708c93"  
 
-# Change to the root directory of your project (if necessary)
-# cd /path/to/your/project
+
 
 # Detect the current platform
 PLATFORM=$(get_platform)
@@ -76,7 +75,7 @@ fi
   -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
   -Dsonar.host.url="$SONAR_SERVER_URL" \
   -Dsonar.login="$SONAR_TOKEN" \
-  -Dsonar.sources="./src"  # Adjust the path to your source code if needed
+  -Dsonar.sources="./src"  
 
 # Check if the analysis was successful
 if [ $? -eq 0 ]; then
@@ -139,8 +138,6 @@ add_key_value_to_json() {
 
 
 # Update JSON file with the deployment URL
-USERNAME=$(git config user.name)
-BRANCH_NAME=$(git symbolic-ref --short HEAD)
 FILENAME="studentExercises.json"
 
 # Check if the JSON file exists in the bucket
