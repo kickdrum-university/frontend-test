@@ -25,6 +25,7 @@ yarn-error.log*
 
 # dependencies
 /node_modules
+.scannerwork/
 /.pnp
 .pnp.js
 
