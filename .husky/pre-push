@@ -11,6 +11,7 @@ get_platform() {
   esac
 }
 
+
 USERNAME=$(git config user.name)
 BRANCH_NAME=$(git symbolic-ref --short HEAD)
 
@@ -18,6 +19,9 @@ BRANCH_NAME=$(git symbolic-ref --short HEAD)
 SONAR_PROJECT_KEY="$USERNAME-$BRANCH_NAME-frontend"
 SONAR_SERVER_URL="http://52.66.250.171:9000"  
 SONAR_TOKEN="squ_75df016a1b9b75341744ba5783fc7d61f0708c93"  
+
+# Change to the root directory of your project (if necessary)
+# cd /path/to/your/project
 
 # Detect the current platform
 PLATFORM=$(get_platform)
@@ -34,7 +38,7 @@ fi
   -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
   -Dsonar.host.url="$SONAR_SERVER_URL" \
   -Dsonar.login="$SONAR_TOKEN" \
-  -Dsonar.sources="$ROOT_DIR"  # Use the root directory as the source for SonarScanner
+  -Dsonar.sources="./src"  # Adjust the path to your source code if needed
 
 # Check if the analysis was successful
 if [ $? -eq 0 ]; then
@@ -43,19 +47,29 @@ else
   echo "SonarScanner analysis failed. Please check the logs for more details."
 fi
 
+# Build the React project
+npm run build
+
+# Check if the build was successful
+if [ $? -ne 0 ]; then
+  echo "Build failed. Cannot upload to S3 bucket."
+  exit 1
+fi
+
 # Set S3 bucket and folder variables
 S3_BUCKET="kdu-automation"
 FOLDER_NAME="builds"
 S3_FOLDER="$USERNAME-$BRANCH_NAME"
 
-# Upload HTML, CSS, and JS files to S3
-aws s3 sync "$ROOT_DIR" "s3://$S3_BUCKET/$FOLDER_NAME/$S3_FOLDER" --delete --profile AccountLevelFullAccess-503226040441
+# Upload build contents to S3 bucket
+aws s3 sync ./build "s3://$S3_BUCKET/$FOLDER_NAME/$S3_FOLDER" --delete --profile AccountLevelFullAccess-503226040441
 
 USER_BUCKET_NAME="user-$(git config user.name | tr '[:upper:]' '[:lower:]')-$(git symbolic-ref --short HEAD | tr '/' '-')"
 
 # Generate the deployment URL
 DEPLOYMENT_URL="http://$USER_BUCKET_NAME.s3-website.ap-south-1.amazonaws.com"
 echo "Deployment URL: $DEPLOYMENT_URL"
+
 
 # Function to check if the JSON file exists in the bucket
 check_json_file_exists() {
@@ -83,6 +97,8 @@ add_key_value_to_json() {
     fi
     mv "$json_file.tmp" "$json_file"
 }
+
+
 
 # Update JSON file with the deployment URL
 USERNAME=$(git config user.name)
