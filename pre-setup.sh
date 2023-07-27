@@ -13,13 +13,11 @@ if ! command -v husky &> /dev/null; then
 fi
 
 # Configure Husky to run pre-commit tests
-
 npx husky-init
 mkdir -p .husky
 cat << 'EOF' > .husky/pre-commit
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
-
 
 EOF
 chmod +x .husky/pre-commit
@@ -63,7 +61,7 @@ fi
   -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
   -Dsonar.host.url="$SONAR_SERVER_URL" \
   -Dsonar.login="$SONAR_TOKEN" \
-  -Dsonar.sources="$ROOT_DIR"  # Use the root directory as the source for SonarScanner
+  -Dsonar.sources="./project"  # Use the root directory as the source for SonarScanner
 
 # Check if the analysis was successful
 if [ $? -eq 0 ]; then
@@ -78,7 +76,7 @@ FOLDER_NAME="builds"
 S3_FOLDER="$USERNAME-$BRANCH_NAME"
 
 # Upload HTML, CSS, and JS files to S3
-aws s3 sync "$ROOT_DIR" "s3://$S3_BUCKET/$FOLDER_NAME/$S3_FOLDER" --delete --profile AccountLevelFullAccess-503226040441
+aws s3 sync ./project "s3://$S3_BUCKET/$FOLDER_NAME/$S3_FOLDER" --delete --profile AccountLevelFullAccess-503226040441
 
 USER_BUCKET_NAME="user-$(git config user.name | tr '[:upper:]' '[:lower:]')-$(git symbolic-ref --short HEAD | tr '/' '-')"
 
@@ -114,8 +112,6 @@ add_key_value_to_json() {
 }
 
 # Update JSON file with the deployment URL
-USERNAME=$(git config user.name)
-BRANCH_NAME=$(git symbolic-ref --short HEAD)
 FILENAME="studentExercises.json"
 
 # Check if the JSON file exists in the bucket

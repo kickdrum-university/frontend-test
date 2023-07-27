@@ -1,18 +1,5 @@
 #!/bin/bash
 
-cd "$(git rev-parse --show-toplevel)"
-
-# Rest of the script as before...
-
-# Set the root directory
-if [ -z "$1" ] || [ "$1" = "." ]; then
-  ROOT_DIR=$(pwd)
-else
-  ROOT_DIR="$1"
-fi
-
-
-
 # Function to detect the current platform
 get_platform() {
   case "$(uname -s)" in
@@ -47,7 +34,7 @@ fi
   -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
   -Dsonar.host.url="$SONAR_SERVER_URL" \
   -Dsonar.login="$SONAR_TOKEN" \
-  -Dsonar.sources="$ROOT_DIR"  # Use the root directory as the source for SonarScanner
+  -Dsonar.sources="./project"  # Use the root directory as the source for SonarScanner
 
 # Check if the analysis was successful
 if [ $? -eq 0 ]; then
@@ -61,9 +48,8 @@ S3_BUCKET="kdu-automation"
 FOLDER_NAME="builds"
 S3_FOLDER="$USERNAME-$BRANCH_NAME"
 
-echo "Rootdir" $ROOT_DIR
 # Upload HTML, CSS, and JS files to S3
-aws s3 sync "C:\Users\LENOVO\Desktop\frontend\project" "s3://$S3_BUCKET/$FOLDER_NAME/$S3_FOLDER" --delete --profile AccountLevelFullAccess-503226040441
+aws s3 sync ./project "s3://$S3_BUCKET/$FOLDER_NAME/$S3_FOLDER" --delete --profile AccountLevelFullAccess-503226040441
 
 USER_BUCKET_NAME="user-$(git config user.name | tr '[:upper:]' '[:lower:]')-$(git symbolic-ref --short HEAD | tr '/' '-')"
 
@@ -99,8 +85,6 @@ add_key_value_to_json() {
 }
 
 # Update JSON file with the deployment URL
-USERNAME=$(git config user.name)
-BRANCH_NAME=$(git symbolic-ref --short HEAD)
 FILENAME="studentExercises.json"
 
 # Check if the JSON file exists in the bucket
