@@ -3,7 +3,7 @@ import logo from "./logo.svg";
 import "./App.css";
 
 function App() {
-  const password = "123456";
+  const password = "123456pre";
   return (
     <div className="App">
       <header className="App-header">
