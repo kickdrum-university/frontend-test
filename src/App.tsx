@@ -8,8 +8,8 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Edit <code>src/App.tsx</code> to reloa exercise--reacte new bucket
-          load image new.
+          Edit <code>src/App.tsx</code> to reloa exercise--racte new bucket load
+          image new.
         </p>
         <a
           className="App-link"
