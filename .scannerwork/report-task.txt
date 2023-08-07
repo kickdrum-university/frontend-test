@@ -2,5 +2,5 @@ projectKey=yadavpreeti00-exercise-2-frontend
 serverUrl=http://52.66.250.171:9000
 serverVersion=10.1.0.73491
 dashboardUrl=http://52.66.250.171:9000/dashboard?id=yadavpreeti00-exercise-2-frontend
-ceTaskId=AYnPYABp4ojb7SErA6MB
-ceTaskUrl=http://52.66.250.171:9000/api/ce/task?id=AYnPYABp4ojb7SErA6MB
+ceTaskId=AYnPff9j4ojb7SErA6MH
+ceTaskUrl=http://52.66.250.171:9000/api/ce/task?id=AYnPff9j4ojb7SErA6MH
