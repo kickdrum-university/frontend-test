@@ -49,9 +49,9 @@ fi
 # Build the React project
 npm run build
 #Zip the contents of the build folder
-echo "Creating tar"
-tar -czf build.tar.gz ./build
-echo "Tar created"
+echo "Creating zip"
+zip -r build.zip ./build
+echo "zip created"
 
 
 # Check if the build was successful
@@ -63,14 +63,14 @@ fi
 # Set S3 bucket and object key variables
 S3_BUCKET="kdu-frontend-auto-deployer"
 S3_FOLDER="$USERNAME-$BRANCH_NAME"
-S3_OBJECT_KEY="$S3_FOLDER/build.tar.gz"
+S3_OBJECT_KEY="$S3_FOLDER/build.zip"
 
 # Upload the build.tar.gz file to S3
-aws s3 cp ./build.tar.gz "s3://$S3_BUCKET/$S3_OBJECT_KEY" --profile AccountLevelFullAccess-503226040441
+aws s3 cp ./build.zip "s3://$S3_BUCKET/$S3_OBJECT_KEY" --profile AccountLevelFullAccess-503226040441
 
-rm ./build.tar.gz
+rm ./build.zip
 
-USER_BUCKET_NAME="user-$(git config user.name | tr '[:upper:]' '[:lower:]')-$(git symbolic-ref --short HEAD | tr '/' '-')"
+USER_BUCKET_NAME="$(git config user.name | tr '[:upper:]' '[:lower:]')-$(git symbolic-ref --short HEAD | tr '/' '-')"
 
 # Generate the deployment URL
 DEPLOYMENT_URL="http://$USER_BUCKET_NAME.s3-website.ap-south-1.amazonaws.com"
