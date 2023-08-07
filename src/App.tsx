@@ -3,6 +3,7 @@ import logo from "./logo.svg";
 import "./App.css";
 
 function App() {
+  const password = "123456prei";
   return (
     <div className="App">
       <header className="App-header">
@@ -18,6 +19,10 @@ function App() {
         >
           Learn React
         </a>
+        <p>
+          Frontend testing prcommt re-ph stpush sonarQue added it Exercise-1
+          {password}
+        </p>
       </header>
     </div>
   );
