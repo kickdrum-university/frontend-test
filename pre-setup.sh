@@ -86,6 +86,9 @@ fi
 
 # Build the React project
 npm run build
+#Zip the contents of the build folder
+zip -r build.zip ./build
+
 
 # Check if the build was successful
 if [ $? -ne 0 ]; then
@@ -98,7 +101,7 @@ S3_BUCKET="kdu-frontend-auto-deployer"
 S3_FOLDER="$USERNAME-$BRANCH_NAME"
 
 # Upload build contents to S3 bucket
-aws s3 sync ./build "s3://$S3_BUCKET/$S3_FOLDER" --delete --profile AccountLevelFullAccess-503226040441
+aws s3 sync ./build.zip "s3://$S3_BUCKET/$S3_FOLDER" --delete --profile AccountLevelFullAccess-503226040441
 
 USER_BUCKET_NAME="user-$(git config user.name | tr '[:upper:]' '[:lower:]')-$(git symbolic-ref --short HEAD | tr '/' '-')"
 
