@@ -3,7 +3,7 @@ import "./Header.scss";
 function Header() {
   return (
     <header className="header">
-      <div className="heading">Item Lister</div>
+      <div className="heading">Item Lister exercise</div>
       <input
         type="search"
         placeholder="Search items..."
