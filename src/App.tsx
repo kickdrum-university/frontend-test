@@ -2,8 +2,10 @@ import React from "react";
 import "./App.css";
 import Header from "./components/header/Header";
 import ItemContainer from "./components/item-container/ItemContainer";
+// import Item from "./components/item-container/item-list/item/Item";
 
 function App() {
+  // var unused="1234";
   return (
     <div className="App">
       <Header />
