@@ -1,0 +1,22 @@
+.form {
+  padding: 0.125rem;
+  .heading {
+    padding: 0.4rem 0rem;
+    font-size: 2rem;
+    text-decoration: bold;
+  }
+  .input-field {
+    width: 15%;
+    padding: 0.625rem 0.1rem 0.5rem;
+    border: 0.05rem solid #ccc;
+    border-radius: 0.25rem;
+  }
+  .submit-btn {
+    margin-left: 0.5%;
+    color: #fff;
+    background-color: #000;
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.6rem;
+    font-size: 1rem;
+  }
+}

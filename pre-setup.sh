@@ -101,11 +101,19 @@ S3_FOLDER="$USERNAME-$BRANCH_NAME"
 # Upload build contents to S3 bucket
 aws s3 sync ./build "s3://$S3_BUCKET/$FOLDER_NAME/$S3_FOLDER" --delete --profile AccountLevelFullAccess-503226040441
 
+# Check if the upload was successful
+if [ $? -eq 0 ]; then
+  echo "Build uploaded to S3 bucket successfully."
+else
+  echo "Failed to upload the build to S3 bucket. Please check the logs for more details."
+fi
+
 USER_BUCKET_NAME="$(git config user.name | tr '[:upper:]' '[:lower:]')-$(git symbolic-ref --short HEAD | tr '/' '-')"
 
 # Generate the deployment URL
 DEPLOYMENT_URL="http://$USER_BUCKET_NAME.s3-website.ap-south-1.amazonaws.com"
 echo "Deployment URL: $DEPLOYMENT_URL"
+echo "Please Note : It may take 2-3 minutes to deploy the build in S3. Please check after 2 minutes."
 
 
 # Function to check if the JSON file exists in the bucket
@@ -158,15 +166,10 @@ add_key_value_to_json "$KEY" "$VALUE" ./temp.json
 # Upload the updated JSON file back to the bucket
 aws s3 cp ./temp.json "s3://kdu-automation/frontend/$FILENAME" --profile AccountLevelFullAccess-503226040441
 
-echo "JSON file uploaded successfully."
+echo "JSON file studentExercises.json uploaded successfully."
 
-# Check if the upload was successful
-if [ $? -eq 0 ]; then
-  echo "Build uploaded to S3 bucket successfully."
-else
-  echo "Failed to upload the build to S3 bucket. Please check the logs for more details."
-fi
 
+# deploy the exercise to a new s3 bucket
 destination_bucket="${USERNAME}-${BRANCH_NAME}"
 
 # Check if the destination bucket already exists
@@ -174,8 +177,13 @@ if aws s3api head-bucket --bucket "${destination_bucket}" 2>/dev/null --profile 
     echo "Bucket '${destination_bucket}' already exists. Skipping bucket creation."
 else
     # Create a new S3 bucket
-    aws s3api create-bucket --bucket "${destination_bucket}" --region ap-south-1 --create-bucket-configuration LocationConstraint=ap-south-1 --profile AccountLevelFullAccess-503226040441
-    aws s3api put-public-access-block --bucket $destination_bucket --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false" --profile AccountLevelFullAccess-503226040441
+    if aws s3api create-bucket --bucket "${destination_bucket}" --region ap-south-1 --create-bucket-configuration LocationConstraint=ap-south-1 --profile AccountLevelFullAccess-503226040441; then
+        aws s3api put-public-access-block --bucket $destination_bucket --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false" --profile AccountLevelFullAccess-503226040441
+        echo "Bucket '${destination_bucket}' created successfully."
+    else
+        echo "Failed to create bucket '${destination_bucket}'. Exiting..."
+        exit 1
+    fi
 fi
 
 # Upload build contents to S3 bucket for hosting
@@ -203,7 +211,6 @@ aws s3api put-bucket-policy --bucket "${destination_bucket}" --policy '{
 }' --profile AccountLevelFullAccess-503226040441
 
 
-
 echo "build folder has been uploaded to '${destination_bucket}'"
 
 # Update JSON file with the deployment URL
@@ -224,7 +231,7 @@ add_key_value_to_json "${KEY}" "${VALUE}" ./temp.json
 aws s3 cp ./temp.json "s3://kdu-automation/frontend/$DEPLOYED_URL_FILENAME" --profile AccountLevelFullAccess-503226040441
 
 
-echo "Submissions JSON file uploaded successfully."
+echo "JSON file submissions.json uploaded successfully."
 
 #remove the temporary file
 rm ./temp.json

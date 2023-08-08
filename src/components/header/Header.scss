@@ -1,0 +1,24 @@
+.header {
+  background-color: #28a745;
+  display: flex;
+  align-items: center;
+  padding: 0.5%;
+  gap: 40%;
+  .heading {
+    font-size: 2.5rem;
+    color: #fff;
+    margin-left: 10%;
+    padding: 0.0625rem;
+  }
+  .search-box {
+    outline: none;
+    width: 30%;
+    padding: 0.25rem 0.25rem;
+    border-radius: 0.1875rem;
+    border: solid;
+    border-color: #fff;
+  }
+  .search-box:focus {
+    outline: none;
+  }
+}
