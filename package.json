@@ -44,6 +44,7 @@
     ]
   },
   "devDependencies": {
+    "eslint-formatter-codeframe": "^7.32.1",
     "husky": "^8.0.0",
     "lint-staged": "^13.2.3",
     "sonarqube-scanner": "^3.0.1"
@@ -52,9 +53,7 @@
     "*.{js,jsx,ts,tsx}": [
       "npx prettier --write",
       "npm test -- --watchAll=false --findRelatedTests --bail",
-      "npx eslint",
-      "npx eslint --fix --no-error-on-unmatched-pattern --quiet --max-warnings 0"
-
+      "npx eslint"
     ]
   }
 }
