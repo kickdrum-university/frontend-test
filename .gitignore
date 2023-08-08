@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/.scannerwork
 /.pnp
 .pnp.js
 
@@ -10,6 +11,7 @@
 
 # production
 /build
+/node_modules
 
 # misc
 .DS_Store
