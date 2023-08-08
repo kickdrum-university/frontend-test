@@ -23,7 +23,7 @@ cat << 'EOF' > .husky/pre-commit
 . "$(dirname -- "$0")/_/husky.sh"
 
 # Run ESLint with the rule to detect unused imports, excluding the "build" folder
-npx eslint --max-warnings=0 --ext .js,.jsx,.ts,.tsx --quiet . --ignore-pattern "build"
+npx eslint --max-warnings=0 --ext .js,.jsx,.ts,.tsx . --ignore-pattern "build"
 
 npx lint-staged
 EOF

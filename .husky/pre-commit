@@ -2,13 +2,6 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 # Run ESLint with the rule to detect unused imports, excluding the "build" folder
-
-
-#npx eslint --max-warnings=0 --ext .js,.jsx,.ts,.tsx --quiet . --ignore-pattern "build"
-
-# Run ESLint to detect unused imports, excluding the "build" folder
-# Run ESLint to detect unused imports, excluding the "build" folder
-npx eslint --ext .js,.jsx,.ts,.tsx --quiet . --ignore-pattern "build" --no-error-on-unmatched-pattern
-
+npx eslint --max-warnings=0 --ext .js,.jsx,.ts,.tsx . --ignore-pattern "build"
 
 npx lint-staged
