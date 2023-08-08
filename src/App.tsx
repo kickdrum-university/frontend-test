@@ -4,7 +4,7 @@ import Header from "./components/header/Header";
 import ItemContainer from "./components/item-container/ItemContainer";
 
 function App() {
-  var abc = "unused variableis";
+  var abc = "unused variableo";
 
   return (
     <div className="App">

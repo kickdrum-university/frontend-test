@@ -8,7 +8,7 @@
 
 # Run ESLint to detect unused imports, excluding the "build" folder
 # Run ESLint to detect unused imports, excluding the "build" folder
-npx eslint --ext .js,.jsx,.ts,.tsx --quiet . --ignore-pattern "build" --format=stylish
+npx eslint --ext .js,.jsx,.ts,.tsx --quiet . --ignore-pattern "build" --no-error-on-unmatched-pattern
 
 
 npx lint-staged
