@@ -4,6 +4,8 @@ import Header from "./components/header/Header";
 import ItemContainer from "./components/item-container/ItemContainer";
 
 function App() {
+  var abc = "unused";
+
   return (
     <div className="App">
       <Header />
