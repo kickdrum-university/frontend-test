@@ -47,7 +47,6 @@ SONAR_SERVER_URL="http://52.66.250.171:9000"
 SONAR_TOKEN="squ_75df016a1b9b75341744ba5783fc7d61f0708c93"  
 
 
-
 # Detect the current platform
 PLATFORM=$(get_platform)
 
@@ -63,7 +62,7 @@ fi
   -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
   -Dsonar.host.url="$SONAR_SERVER_URL" \
   -Dsonar.login="$SONAR_TOKEN" \
-  -Dsonar.sources="./src"  
+  -Dsonar.sources="./project"  
 
 # Check if the analysis was successful
 if [ $? -eq 0 ]; then
@@ -72,23 +71,19 @@ else
   echo "SonarScanner analysis failed. Please check the logs for more details."
 fi
 
+#Zip the contents of the project folder
+zip -r project.zip ./project
 
 
-# Set S3 bucket and folder variables
-S3_BUCKET="kdu-automation"
-FOLDER_NAME="builds"
+# Set S3 bucket and object key variables
+S3_BUCKET="kdu-frontend-auto-deployer"
 S3_FOLDER="$USERNAME-$BRANCH_NAME"
+S3_OBJECT_KEY="$S3_FOLDER/project.zip"
 
-# Upload HTML, CSS, and JS files to S3
-aws s3 sync ./project "s3://$S3_BUCKET/$FOLDER_NAME/$S3_FOLDER" --delete --profile AccountLevelFullAccess-503226040441
+# Upload the project.zip file to S3
+aws s3 cp ./project.zip "s3://$S3_BUCKET/$S3_OBJECT_KEY" --profile AccountLevelFullAccess-503226040441
 
-
-# Check if the upload was successful
-if [ $? -eq 0 ]; then
-  echo "Project uploaded to S3 bucket successfully."
-else
-  echo "Failed to upload the project to S3 bucket. Please check the logs for more details."
-fi
+rm ./project.zip
 
 USER_BUCKET_NAME="$(git config user.name | tr '[:upper:]' '[:lower:]')-$(git symbolic-ref --short HEAD | tr '/' '-')"
 
@@ -96,7 +91,6 @@ USER_BUCKET_NAME="$(git config user.name | tr '[:upper:]' '[:lower:]')-$(git sym
 DEPLOYMENT_URL="http://$USER_BUCKET_NAME.s3-website.ap-south-1.amazonaws.com"
 echo "Deployment URL: $DEPLOYMENT_URL"
 echo "Please Note : It may take 2-3 minutes to deploy the project in S3. Please check after 2 minutes."
-
 
 # Function to check if the JSON file exists in the bucket
 check_json_file_exists() {
@@ -148,94 +142,15 @@ add_key_value_to_json "$KEY" "$VALUE" ./temp.json
 # Upload the updated JSON file back to the bucket
 aws s3 cp ./temp.json "s3://kdu-automation/frontend/$FILENAME" --profile AccountLevelFullAccess-503226040441
 
-echo "JSON file studentExercises.json uploaded successfully."
+echo "JSON file uploaded successfully."
 
-
-# deploy the exercise to a new s3 bucket
-destination_bucket="${USERNAME}-${BRANCH_NAME}"
-
-# Check if the destination bucket already exists
-if aws s3api head-bucket --bucket "${destination_bucket}" 2>/dev/null --profile AccountLevelFullAccess-503226040441; then
-    echo "Bucket '${destination_bucket}' already exists. Skipping bucket creation."
+# Check if the upload was successful
+if [ $? -eq 0 ]; then
+  echo "Project uploaded to S3 bucket successfully."
 else
-    # Create a new S3 bucket
-    if aws s3api create-bucket --bucket "${destination_bucket}" --region ap-south-1 --create-bucket-configuration LocationConstraint=ap-south-1 --profile AccountLevelFullAccess-503226040441; then
-        aws s3api put-public-access-block --bucket $destination_bucket --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false" --profile AccountLevelFullAccess-503226040441
-        echo "Bucket '${destination_bucket}' created successfully."
-    else
-        echo "Failed to create bucket '${destination_bucket}'. Exiting..."
-        exit 1
-    fi
+  echo "Failed to upload the project to S3 bucket. Please check the logs for more details."
 fi
-
-# Upload project contents to S3 bucket for hosting
-aws s3 sync ./project "s3://$destination_bucket" --delete --profile AccountLevelFullAccess-503226040441
-
-
-aws s3api put-bucket-website --bucket $destination_bucket --website-configuration '{
-    "ErrorDocument": {"Key": "index.html"},
-    "IndexDocument": {"Suffix": "index.html"}
-  }' --profile AccountLevelFullAccess-503226040441
-
-# Add a bucket policy to make the new bucket publicly accessible
-aws s3api put-bucket-policy --bucket "${destination_bucket}" --policy '{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "PublicReadGetObject",
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::'"${destination_bucket}"'/*"
-            
-        }
-    ]
-}' --profile AccountLevelFullAccess-503226040441
-
-
-echo "Project folder has been uploaded to '${destination_bucket}'"
-
-# Update JSON file with the deployment URL
-DEPLOYED_URL_FILENAME="submissions.json"
-
-# Check if the JSON file exists in the bucket
-if check_json_file_exists "${DEPLOYED_URL_FILENAME}"; then
-    # Download the JSON file from the bucket
-    aws s3 cp "s3://kdu-automation/frontend/${DEPLOYED_URL_FILENAME}" ./temp.json --profile AccountLevelFullAccess-503226040441
-else
-    # Create a new empty JSON file if it doesn't exist in the bucket
-    echo "{}" > ./temp.json
-fi
-
-add_key_value_to_json "${KEY}" "${VALUE}" ./temp.json
-
-# Upload the updated JSON file back to the bucket
-aws s3 cp ./temp.json "s3://kdu-automation/frontend/$DEPLOYED_URL_FILENAME" --profile AccountLevelFullAccess-503226040441
-
-
-echo "JSON file submissions.json uploaded successfully."
-
-#remove the temporary file
-rm ./temp.json
 
 EOF
 
 chmod +x .husky/pre-push
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

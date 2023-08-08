@@ -37,7 +37,7 @@ fi
   -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
   -Dsonar.host.url="$SONAR_SERVER_URL" \
   -Dsonar.login="$SONAR_TOKEN" \
-  -Dsonar.sources="./src"  
+  -Dsonar.sources="./project"  
 
 # Check if the analysis was successful
 if [ $? -eq 0 ]; then
